@@ -1,0 +1,24 @@
+# Секреты и локальная конфигурация
+.env
+.env.*
+!.env.example
+
+# Локальные данные пользователей
+*.db
+*.sqlite
+*.sqlite3
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+coverage.xml
+htmlcov/
+
+# IDE и ОС
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
