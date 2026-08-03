@@ -22,8 +22,9 @@
 - Railway Worker: `binibit-worker` (`6e328be0-730e-46e3-a175-109276be390f`).
 - Persistent volume: `binibit-worker-volume` (`a710a98c-c576-42a9-ad8c-38ca74f3f92e`), подключён в `/data`.
 - SQLite: `DATABASE_PATH=/data/binibit_bot.db`.
-- Последний production deploy: `0684a05b-1e54-47eb-b411-772ca7593746`.
+- Последний production deploy: `f31776c2-a409-452b-be63-af8ea1f4d9aa`.
 - Подтверждённый Railway status: `SUCCESS`, `stopped: false`.
+- Стартовое меню дополнено первой URL-кнопкой «Открыть BiNiBit» → `https://binibit.com/ru`; ниже сохранена кнопка «Пройти регистрацию».
 - Ссылки production:
   - пополнение: `https://t.me/BiNiBit_Pixel/1292`;
   - поддержка: `https://t.me/BiNiBit_Pixel`.

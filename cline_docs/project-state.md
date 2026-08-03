@@ -29,7 +29,7 @@ MVP Telegram-бота развёрнут как Railway Worker и подтвер
 - Railway service: `binibit-worker` (`6e328be0-730e-46e3-a175-109276be390f`).
 - Persistent volume: `binibit-worker-volume` (`a710a98c-c576-42a9-ad8c-38ca74f3f92e`), mount path `/data`.
 - База в Railway: `DATABASE_PATH=/data/binibit_bot.db`.
-- Последний подтверждённый deployment: `0684a05b-1e54-47eb-b411-772ca7593746`.
+- Последний подтверждённый deployment: `f31776c2-a409-452b-be63-af8ea1f4d9aa`.
 - Последний статус deployment: `SUCCESS`, сервис запущен (`stopped: false`).
 - Обновлены production-ссылки:
   - инструкция пополнения: `https://t.me/BiNiBit_Pixel/1292`;
@@ -40,7 +40,7 @@ MVP Telegram-бота развёрнут как Railway Worker и подтвер
 
 - `bot/database.py` — SQLite-схема и слой подключения.
 - `bot/referral_manager.py` — FIFO-выдача, лимит трёх выдач, статусы и решения куратора.
-- `bot/quiz_flow.py` — информационные шаги пользователя.
+- `bot/quiz_flow.py` — стартовое меню и информационные шаги пользователя; первой строкой добавлена URL-кнопка «Открыть BiNiBit» → `https://binibit.com/ru`.
 - `bot/registration_flow.py` — регистрация, приём реферальной ссылки и скрина.
 - `bot/admin_flow.py` — добавление стартовых ссылок и обработка решений куратора.
 - `bot/bot_core.py` — точка входа и регистрация обработчиков aiogram.

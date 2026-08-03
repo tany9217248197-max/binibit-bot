@@ -14,6 +14,11 @@ def start_keyboard() -> InlineKeyboardMarkup:
         inline_keyboard=[
             [
                 InlineKeyboardButton(
+                    text="Открыть BiNiBit", url="https://binibit.com/ru"
+                )
+            ],
+            [
+                InlineKeyboardButton(
                     text="Пройти регистрацию", callback_data="registration:start"
                 )
             ],
