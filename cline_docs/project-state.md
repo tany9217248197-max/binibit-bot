@@ -1,11 +1,11 @@
 Проект: BiNiBit — бот-воронка 3×3
-Завершённость: [█████████░░░░░░] 65% — подготовка Railway-деплоя
+Завершённость: [█████████████░] 90% — production MVP
 
 # Текущее состояние
 
 ## Текущая фаза
 
-Базовый MVP Telegram-бота реализован и локально проверен. С текущей Windows-машины подтверждён таймаут до `api.telegram.org:443`, поэтому выбран постоянный запуск через Railway Worker с private GitHub-репозиторием.
+MVP Telegram-бота развёрнут как Railway Worker и подтверждён live-проверкой с телефона. Следующая фаза — пройти полный бизнес-flow и подготовить операционные инструкции для куратора.
 
 ## Подтверждённые решения
 
@@ -21,12 +21,20 @@
 - API Binibit не используется: подтверждённой интеграции для рефералов, регистрации или стейкинга нет.
 - Бот не запрашивает документы, пароли, 2FA-коды или API-ключи и не обещает доходность.
 
-## Актуальные статусы
+## Production-инфраструктура
 
-```text
-submitted → pending_staking → pending_review → active → limit_reached
-                                              ↘ rejected
-```
+- Private GitHub remote: `origin` → `https://github.com/tany9217248197-max/binibit-bot.git`.
+- Railway project: `binibit-bot`.
+- Railway environment: `production`.
+- Railway service: `binibit-worker` (`6e328be0-730e-46e3-a175-109276be390f`).
+- Persistent volume: `binibit-worker-volume` (`a710a98c-c576-42a9-ad8c-38ca74f3f92e`), mount path `/data`.
+- База в Railway: `DATABASE_PATH=/data/binibit_bot.db`.
+- Последний подтверждённый deployment: `0684a05b-1e54-47eb-b411-772ca7593746`.
+- Последний статус deployment: `SUCCESS`, сервис запущен (`stopped: false`).
+- Обновлены production-ссылки:
+  - инструкция пополнения: `https://t.me/BiNiBit_Pixel/1292`;
+  - поддержка: `https://t.me/BiNiBit_Pixel`.
+- `BOT_TOKEN` хранится только в Railway Variables и локальном игнорируемом `bot/.env`. Его значение не включать в сообщения, логи, Git или документацию.
 
 ## Что реализовано
 
@@ -38,10 +46,8 @@ submitted → pending_staking → pending_review → active → limit_reached
 - `bot/bot_core.py` — точка входа и регистрация обработчиков aiogram.
 - `bot/content.json` — пользовательские тексты.
 - `bot/tests/test_referral_manager.py` — тесты ядра FIFO.
-- `bot/.env.example` — шаблон конфигурации без секретов.
-- `.gitignore` — исключает `.env`, SQLite-базы, `.venv`, кэши и устаревший `deployment-map.md` с раскрытым старым токеном.
 - Корневые `Dockerfile` и `.dockerignore` — Railway-сборка только из папки `bot/`, без секретов, базы и исходных медиа.
-- `RAILWAY_DEPLOY.md` — безопасная инструкция: Railway Variables и persistent volume в `/data`.
+- `RAILWAY_DEPLOY.md` — инструкция Railway.
 - `bot/Dockerfile`, `bot/docker-compose.yml`, `bot/.dockerignore`, `bot/DEPLOY_VPS.md` — альтернативный Docker-деплой на VPS.
 
 ## Подтверждённые проверки
@@ -49,24 +55,19 @@ submitted → pending_staking → pending_review → active → limit_reached
 - Рабочий интерпретатор: CPython 3.14.5.
 - SQLite в CPython: 3.53.1.
 - Зависимости установлены в `bot/.venv`: `aiogram 3.30.0`, `pytest 8.4.2`, `python-dotenv 1.2.2`.
-- `python -m pytest tests -q`: **4 passed** (последняя проверка: 0.47 с).
+- `python -m pytest tests -q`: **4 passed**.
 - Все основные модули успешно прошли `py_compile`.
-- Бот стартует до `Start polling`.
-- В логе зафиксирована ошибка подключения к Telegram API:
-  - `Cannot connect to host api.telegram.org:443`
-  - `aiogram.exceptions.TelegramNetworkError`
-- Git-репозиторий инициализирован.
-- `.env`, локальные SQLite-базы и `.venv` подтверждённо игнорируются Git.
-- Docker CLI на Windows не установлен, поэтому локальная Docker-сборка не проверена.
-- Новый Telegram-токен перевыпущен пользователем и не был передан в чат или записан в Git.
+- Локальный запуск доходит до `Start polling`, но сеть текущей Windows-машины не соединяется с `api.telegram.org:443`.
+- Railway deployment имеет статус **SUCCESS**.
+- Пользователь подтвердил с телефона: `/start` в `@Binibit_Global_bot` отвечает корректно.
 
 ## Ограничения и риски
 
-- Полный живой Telegram-flow пока не проверен: Railway Worker ещё не создан и не запущен.
-- В проекте нет настроенного Git remote, поэтому private GitHub-репозиторий ещё не создан.
-- Railway-деплой требует подключить persistent volume с mount path `/data`, иначе SQLite-данные будут потеряны при redeploy.
-- Исходные PDF, DOCX, MP4 и изображения не должны автоматически входить в первый кодовый checkpoint без отдельного решения по хранению крупных материалов.
+- Полный живой сценарий ещё не пройден: выдача стартовой ссылки → регистрация → скрин → решение куратора → активация → FIFO-выдача новой ссылки.
+- Локальная Docker-сборка не проверена: Docker CLI на Windows не установлен.
+- Неотслеживаемые в Git PDF, DOCX, MP4, JPG, XLSX, RTF и рабочие markdown-файлы в корне проекта не включать в кодовый commit без отдельного решения.
+- При утечке токена нужно немедленно выполнить `/revoke` в BotFather, заменить `BOT_TOKEN` в Railway и redeploy.
 
 ## Следующий точный шаг
 
-Создать private GitHub-репозиторий, отправить туда только безопасный код, подключить его к Railway и создать Worker-сервис. В Railway добавить Variables (`BOT_TOKEN`, `ADMIN_TELEGRAM_IDS`, `DEPOSIT_GUIDE_URL`, `SUPPORT_URL`, `DATABASE_PATH=/data/binibit_bot.db`), подключить volume в `/data`, проверить deploy logs и затем пройти flow с телефона: `/start` → выдача стартовой ссылки → регистрация → скрин → решение куратора → активация и FIFO-выдача новой ссылки.
+Проверить полный пользовательский flow на production с отдельным тестовым Telegram-аккаунтом: `/start` → получение ссылки → регистрация → отправка своей ссылки → скрин стейкинга → решение администратора → новая ссылка становится доступной в FIFO.
