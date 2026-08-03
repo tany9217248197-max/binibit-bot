@@ -8,8 +8,8 @@ from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMar
 from referral_manager import ReferralManager
 
 
-def start_keyboard() -> InlineKeyboardMarkup:
-    """Возвращает кнопки первого экрана."""
+def start_keyboard(support_url: str) -> InlineKeyboardMarkup:
+    """Возвращает кнопки первого экрана со ссылкой на поддержку."""
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -30,6 +30,7 @@ def start_keyboard() -> InlineKeyboardMarkup:
                     text="Как работает стейкинг", callback_data="info:staking"
                 ),
             ],
+            [InlineKeyboardButton(text="Нужна помощь?", url=support_url)],
         ]
     )
 
@@ -41,7 +42,9 @@ def build_quiz_router(manager: ReferralManager, content: dict[str, str]) -> Rout
     @router.callback_query(F.data == "info:risks")
     async def show_risks(callback: CallbackQuery) -> None:
         await callback.answer()
-        await callback.message.answer(content["risks"], reply_markup=start_keyboard())
+        await callback.message.answer(
+            content["risks"], reply_markup=start_keyboard(content["support"])
+        )
 
     @router.callback_query(F.data == "info:staking")
     async def show_staking_info(callback: CallbackQuery) -> None:
@@ -72,7 +75,7 @@ def build_quiz_router(manager: ReferralManager, content: dict[str, str]) -> Rout
         manager.set_step(user["id"], f"segment:{segment}")
         await callback.message.answer(
             "Спасибо. Подберём понятный маршрут без лишних шагов.",
-            reply_markup=start_keyboard(),
+            reply_markup=start_keyboard(content["support"]),
         )
 
     return router

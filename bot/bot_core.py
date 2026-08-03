@@ -64,7 +64,9 @@ def build_common_router(
             message.from_user.username,
             message.from_user.full_name,
         )
-        await message.answer(content["welcome"], reply_markup=start_keyboard())
+        await message.answer(
+            content["welcome"], reply_markup=start_keyboard(content["support"])
+        )
 
     @router.message(Command("link"))
     async def issue_link(message: Message) -> None:
