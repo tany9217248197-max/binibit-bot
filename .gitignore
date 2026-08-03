@@ -8,6 +8,9 @@
 *.sqlite
 *.sqlite3
 
+# Устаревшие черновики с скомпрометированными данными
+deployment-map.md
+
 # Python
 __pycache__/
 *.py[cod]
