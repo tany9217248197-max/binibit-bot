@@ -74,3 +74,32 @@ def test_rejection_keeps_link_out_of_queue(manager: ReferralManager) -> None:
     manager.decide_review(review["id"], reviewer_telegram_id=999, approved=False)
 
     assert manager.get_referral_link(create_user(manager, 2)["id"]) is None
+
+
+def test_get_user_referral_link_returns_saved_personal_link(
+    manager: ReferralManager,
+) -> None:
+    user = create_user(manager, 1)
+    manager.submit_referral_link(user["id"], "https://binibit.com/ref/personal")
+
+    link = manager.get_user_referral_link(user["id"])
+
+    assert link is not None
+    assert link.url == "https://binibit.com/ref/personal"
+    assert link.owner_user_id == user["id"]
+
+
+def test_get_previously_issued_link_returns_last_issued_starter_link(
+    manager: ReferralManager,
+) -> None:
+    first = manager.add_admin_referral_link("https://binibit.com/ref/first")
+    manager.add_admin_referral_link("https://binibit.com/ref/second")
+    user = create_user(manager, 77)
+
+    issued = manager.get_referral_link(user["id"])
+    previous = manager.get_previously_issued_link(user["id"])
+
+    assert issued is not None
+    assert previous is not None
+    assert previous.id == issued.id
+    assert previous.url == first.url
