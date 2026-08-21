@@ -184,6 +184,78 @@ class ReferralManager:
                 owner_user_id=row["owner_user_id"],
             )
 
+    def get_user_referral_link(self, user_id: int) -> ReferralLink | None:
+        """Возвращает последнюю сохранённую личную ссылку пользователя."""
+        with self.database.connect() as connection:
+            row = connection.execute(
+                """
+                SELECT *
+                FROM referral_links
+                WHERE owner_user_id = ?
+                ORDER BY id DESC
+                LIMIT 1
+                """,
+                (user_id,),
+            ).fetchone()
+        return self._to_referral_link(row) if row is not None else None
+
+    def get_previously_issued_link(
+        self, recipient_user_id: int
+    ) -> ReferralLink | None:
+        """Возвращает стартовую ссылку, ранее выданную пользователю."""
+        with self.database.connect() as connection:
+            event = connection.execute(
+                """
+                SELECT details
+                FROM events
+                WHERE user_id = ? AND event_name = 'referral_link_issued'
+                ORDER BY id DESC
+                LIMIT 1
+                """,
+                (recipient_user_id,),
+            ).fetchone()
+            if event is None or not event["details"]:
+                return None
+
+            details = str(event["details"])
+            if not details.startswith("link_id="):
+                return None
+
+            try:
+                link_id = int(details.removeprefix("link_id="))
+            except ValueError:
+                return None
+
+            row = connection.execute(
+                "SELECT * FROM referral_links WHERE id = ?",
+                (link_id,),
+            ).fetchone()
+        return self._to_referral_link(row) if row is not None else None
+
+    def get_curator_name_for_link(self, link: ReferralLink) -> str | None:
+        """Возвращает username или имя владельца ссылки, если он известен."""
+        if link.owner_user_id is None:
+            return None
+
+        with self.database.connect() as connection:
+            user = connection.execute(
+                """
+                SELECT username, full_name
+                FROM users
+                WHERE id = ?
+                """,
+                (link.owner_user_id,),
+            ).fetchone()
+            if user is None:
+                return None
+
+        username = user["username"]
+        if username:
+            return username if str(username).startswith("@") else f"@{username}"
+
+        full_name = user["full_name"]
+        return str(full_name).strip() if full_name else None
+
     def create_staking_review(
         self, user_id: int, screenshot_file_id: str
     ) -> sqlite3.Row:
