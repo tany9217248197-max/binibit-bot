@@ -20,6 +20,26 @@ venv/
 coverage.xml
 htmlcov/
 
+# Рабочие материалы и медиавложения вне deploy-контура
+*.pdf
+*.docx
+*.xlsx
+*.rtf
+*.jpg
+*.jpeg
+*.png
+*.mp4
+*.mov
+*.zip
+
+# Локальные служебные и упаковочные файлы
+cline-task.md
+task-pack.md
+implementation-plan.md
+binibit-bot-inspection/
+architecture.md
+*.txt
+
 # IDE и ОС
 .vscode/
 .idea/
