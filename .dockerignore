@@ -10,8 +10,6 @@
 *.jpeg
 *.png
 *.mp4
-*.txt
-!bot/requirements.txt
 bot/.env
 bot/.env.*
 !bot/.env.example
