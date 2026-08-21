@@ -232,6 +232,30 @@ class ReferralManager:
             ).fetchone()
         return self._to_referral_link(row) if row is not None else None
 
+    def get_curator_name_for_link(self, link: ReferralLink) -> str | None:
+        """Возвращает username или имя владельца ссылки, если он известен."""
+        if link.owner_user_id is None:
+            return None
+
+        with self.database.connect() as connection:
+            user = connection.execute(
+                """
+                SELECT username, full_name
+                FROM users
+                WHERE id = ?
+                """,
+                (link.owner_user_id,),
+            ).fetchone()
+            if user is None:
+                return None
+
+        username = user["username"]
+        if username:
+            return username if str(username).startswith("@") else f"@{username}"
+
+        full_name = user["full_name"]
+        return str(full_name).strip() if full_name else None
+
     def create_staking_review(
         self, user_id: int, screenshot_file_id: str
     ) -> sqlite3.Row:

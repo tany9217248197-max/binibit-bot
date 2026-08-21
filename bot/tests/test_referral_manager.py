@@ -103,3 +103,14 @@ def test_get_previously_issued_link_returns_last_issued_starter_link(
     assert previous is not None
     assert previous.id == issued.id
     assert previous.url == first.url
+
+
+def test_get_curator_name_for_link_returns_owner_username(
+    manager: ReferralManager,
+) -> None:
+    curator = create_user(manager, 1)
+    link = manager.submit_referral_link(curator["id"], "https://binibit.com/ref/curator")
+
+    curator_name = manager.get_curator_name_for_link(link)
+
+    assert curator_name == "@user1"

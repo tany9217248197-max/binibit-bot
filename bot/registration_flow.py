@@ -70,11 +70,18 @@ def next_steps_keyboard(deposit_guide_url: str) -> InlineKeyboardMarkup:
     )
 
 
-def format_curator_hint(link: ReferralLink, support_url: str) -> str:
-    """Возвращает подсказку, к кому обратиться по выданной стартовой ссылке."""
-    curator_username = STARTER_CURATORS.get(link.url)
-    if curator_username:
-        return f"Если возникли трудности, обратитесь к куратору: {curator_username}"
+def format_curator_hint(
+    manager: ReferralManager, link: ReferralLink, support_url: str
+) -> str:
+    """Возвращает подсказку, к кому обратиться по выданной ссылке."""
+    curator_name = manager.get_curator_name_for_link(link)
+    if curator_name:
+        return f"Если возникли трудности, обратитесь к куратору: {curator_name}"
+
+    starter_curator = STARTER_CURATORS.get(link.url)
+    if starter_curator:
+        return f"Если возникли трудности, обратитесь к куратору: {starter_curator}"
+
     return f"Если возникли трудности, обратитесь к куратору: {support_url}"
 
 
@@ -123,7 +130,7 @@ def build_registration_router(
                 "Ранее вам уже выдавалась ссылка для регистрации.\n"
                 "Проверьте, завершили ли вы регистрацию, и пришлите в ответ свою реферальную ссылку для постановки в очередь.\n\n"
                 f"Ваша ранее выданная ссылка:\n{previous_link.url}\n\n"
-                f"{format_curator_hint(previous_link, support_url)}"
+                f"{format_curator_hint(manager, previous_link, support_url)}"
             )
             return
 
